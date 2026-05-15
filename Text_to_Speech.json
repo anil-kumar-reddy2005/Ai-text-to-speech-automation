@@ -1,0 +1,151 @@
+{
+  "name": "Text_to_Speech",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -304,
+        -96
+      ],
+      "id": "9c38bacb-ab1f-42bf-a7ee-de9c005acdec",
+      "name": "When chat message received",
+      "webhookId": "18d50d34-1461-4cde-898e-1a2088cc6abb"
+    },
+    {
+      "parameters": {
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are a professional podcast script writer.  Write a conversational and engaging podcast script on the topic: {{ $json.chatInput }}.  Keep it around 2 minutes when spoken.  Use a friendly and informative tone, as if talking directly to listeners.  Avoid any headings, labels, or formatting. Output plain text only."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.8,
+      "position": [
+        -96,
+        -96
+      ],
+      "id": "1946966e-cd55-42e9-a8b7-9c0a39975e71",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        128
+      ],
+      "id": "14dc3c55-15e8-456a-9251-67fb97d6e219",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "1r3ZvmJ8rAUAVDyZ",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://global.api.murf.ai/v1/speech/stream",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api-key",
+              "value": "ap2_09db2ae5-f8a9-4d57-9da7-2c0f49aadd7b"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{ $json.text }}"
+            },
+            {
+              "name": "voiceId",
+              "value": "Natalie"
+            },
+            {
+              "name": "locale",
+              "value": "en-US"
+            },
+            {
+              "name": "model",
+              "value": "FALCON"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        256,
+        -96
+      ],
+      "id": "e21a089c-f16b-47ca-a463-62a7d812f2e3",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "0f212c80-880c-41ef-bb5b-bb27e596376a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "807f49cc1ba53a6e0c85b4c0549da4f566737a8be349ab3cb1ff501c21a05f67"
+  },
+  "id": "G4nC88ff4QBluoGo",
+  "tags": []
+}
